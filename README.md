@@ -14,9 +14,7 @@ Shout out to the [Chatterbox](https://github.com/resemble-ai/chatterbox) team, w
 
 ## License
 
-This application is available under [the MIT license](https://github.com/pete-rai/our-tune-parody/blob/main/LICENSE). _Please respect the terms of the license._
-
-This software is released with the [karmaware](https://pete-rai.github.io/karmaware) tag
+This application is available under [the MIT license](https://github.com/pete-rai/our-tune-parody/blob/main/LICENSE). _Please respect the terms of the license._ This software is released with the [karmaware](https://pete-rai.github.io/karmaware) tag
 
 ## Ethics
 
@@ -48,30 +46,27 @@ source venv/bin/activate   # On Linux / macOS
 venv\Scripts\activate      # On Windows PowerShell
 ```
 
-Then install the requirements:
+Then you need to install the requirements - which _must be done in the order below_. This order is used to resolve a version clash between PyTorch, Chatter and CUDA. You will see some dependency errors at the end, which you can safely ignore.
 
 ```bash
-pip install -r requirements.txt --no-deps
+pip install ffmpeg-python soundfile
+pip install chatterbox-tts
+pip install torch==2.5.1+cu121 torchaudio==2.5.1+cu121 --extra-index-url https://download.pytorch.org/whl/cu121
 ````
 
-### GPU vs CPU (PyTorch)
-
-The `requirements.txt` file pins PyTorch as:
+The requirements shown here assume you have a CUDA compatible GPU. If you are restricted to a CPU, then remove the `+cu121` text from the last line in the requirements:
 
 ```bash
-torch==2.5.1
+pip install torch==2.5.1 torchaudio==2.5.1 --extra-index-url https://download.pytorch.org/whl/cu121
+````
+
+Also change the model instantiation line in `main.py`:
+
+```python
+MODEL = ChatterboxTTS.from_pretrained(device = "cpu")  # this says "cuda" by default
 ```
 
-This will install the correct build for your system.
-
-* On a machine **without an NVIDIA GPU**, it will install the CPU-only build.
-* On a machine **with a GPU**, pip will usually fetch the CUDA-enabled wheel.
-
-If you want to be explicit and use CUDA 12.1 (as tested here):
-
-```bash
-pip install torch==2.5.1+cu121
-```
+Please note that the CPU mode is untested.
 
 ## Usage
 
@@ -81,22 +76,21 @@ Run the script to generate your own Our Tune style MP3:
 python main.py
 ```
 
-The output will be saved as `our-tune.mp3`, blending the cloned narration with the music.
+The very first time you run this, it can be a bit slow. However, it will be faster in subsequent runs. The output will be saved to `our-tune.mp3`.
 
-You will, of course, first want to edit the narration text to be your own tragic love story.
-
-This text is stored inside `main.py` in the `TRANSCRIPT` list:
+You will, of course, want to edit the narration text to be your own tragic love story. This text is stored inside `main.py` in the `TRANSCRIPT` list:
 
 ```python
 TRANSCRIPT = [
-    # keep your blocks short – use punctuation for pauses, not grammar
     "In the spring of 1912, on the ship they called unsinkable, Rose was a girl trapped in a life of wealth, rules and duty."
     "Then came Jack — a boy with no fortune, just a sketchbook, and a way of looking at her that made her feel truly alive.",
     ...
 ]
 ```
 
-Each list item is a speech block. For easy reading of the code, some strings are on different lines but will be joined into one string by Python. Whereas some string are specifically separated by commas. This is important as separated strings have an audio pause between them, which can be used for dramatic effect.
+Each list item is a speech block. For easy reading of the code, some strings are on different lines - but these will be joined into one single string by Python. Whereas some strings are specifically separated by commas. This is important, as separated strings will have an audio pause between them, which can be used for dramatic effect.
+
+Keep each block short and concise. The chatter model does not work well with long and verbose text.
 
 Use punctuation to control the audio, don't worry about the grammar. Full stops, commas, dashes and ellipses can be used for short pauses. Separate sentence strings generate long pauses.
 
