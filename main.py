@@ -7,11 +7,8 @@ voice of the inimitable Simon Bates.
 
 Our Tune: https://en.wikipedia.org/wiki/Our_Tune
 Git Repo: https://github.com/pete-rai/our-tune-parody
+License : MIT
 
-MIT License
-
-Ethical Use Notice
-------------------
 This project is meant for fun, parody, creative or educational use.
 Please don't use it to do bad things or to hurt anyone.
 Be kind, be sensible and enjoy making your own tragic love stories sound epic.
@@ -125,7 +122,7 @@ def mix(waveform, fadeout, output):
     merge = ffmpeg.output(mixed, output, **{"map_metadata": "-1"}, acodec = "libmp3lame")
     merge.run(input = audio.astype("float32").tobytes(), overwrite_output = True)
 
-# ===== Pipeline =====
+# --- entry point
 
 if __name__ == "__main__":
     voice = speech(TRANSCRIPT)
